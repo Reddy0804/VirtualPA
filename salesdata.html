@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Analysis Dashboard</title>
+    <!-- Add necessary CSS and JavaScript libraries -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="main">
+    <div class="container">
+        <div class="navbar">
+            <img src="images/logo.png" class="logo">
+            <nav>
+                <ul>
+                    <li><a href="salesdata.html">Sales Data</a></li>
+                    <li><a href="cashflows\cashflows.html">Cash Flows</a></li>
+                    <li><a href="inventorymanagement.html">Inventory Mangement</a></li>
+                    <li><a href="https://fe1b7c9c6970ad570a.gradio.live/">Predictive Analysis</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="index.html">Logout</a></li>
+                </ul>
+            </nav>
+            <img src="images/menu.png" class="menu-icon">
+        </div>
+
+        
+    <h1>Sales Analysis Dashboard</h1>
+    
+    <div id="barChart"></div>
+</div>
+    <script>
+        function plotTotalSales() {
+            // Load data from CSV file
+            Plotly.d3.csv("barcode_sensor_data.csv", function(data) {
+                // Process data to calculate total sales for each item
+                var productCounts = {};
+                data.forEach(function(row) {
+                    if (!productCounts.hasOwnProperty(row['Item Name'])) {
+                        productCounts[row['Item Name']] = 0;
+                    }
+                    productCounts[row['Item Name']] += 1;
+                });
+
+                var productNames = Object.keys(productCounts);
+                var productValues = productNames.map(function(name) {
+                    return productCounts[name];
+                });
+
+                // Plot bar chart
+                var barData = {
+                    x: productNames,
+                    y: productValues,
+                    type: 'bar'
+                };
+
+                var layout = {
+                    title: 'Total Sales for Each Item',
+                    xaxis: {
+                        title: 'Item Name'
+                    },
+                    yaxis: {
+                        title: 'Total Sales'
+                    }
+                };
+
+                Plotly.newPlot('barChart', [barData], layout);
+            });
+        }
+
+        // Initial plot
+        plotTotalSales();
+    </script>
+</body>
+</html>

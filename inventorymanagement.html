@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Analysis Dashboard</title>
+    <!-- Add necessary CSS and JavaScript libraries -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="main">
+    <div class="container">
+        <div class="navbar">
+            <img src="images/logo.png" class="logo">
+            <nav>
+                <ul>
+                    <li><a href="salesdata.html">Sales Data</a></li>
+                    <li><a href="cashflows\cashflows.html">Cash Flows</a></li>
+                    <li><a href="inventorymanagement.html">Inventory Mangement</a></li>
+                    <li><a href="https://fe1b7c9c6970ad570a.gradio.live/">Predictive Analysis</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="index.html">Logout</a></li>
+                </ul>
+            </nav>
+            <img src="images/menu.png" class="menu-icon">
+        </div>
+
+
+    <h1>Inventory Analysis Dashboard</h1>
+    
+    <div id="barChart"></div>
+    <div id="refillInfo"></div>
+    <div id="barcodeData"></div>
+
+    <select id="itemDropdown"></select>
+</div>
+    <script>
+        // Define function to read CSV data
+        function readCSV(filename, callback) {
+            fetch(filename)
+                .then(response => response.text())
+                .then(data => callback(data));
+        }
+
+        // Define function to analyze data
+        function analyzeData(selectedItem, salesData, rfidData, weightData, stockData) {
+            // Parse CSV data
+            var sales = salesData.split('\n').map(row => row.split(','));
+            var rfid = rfidData.split('\n').map(row => row.split(','));
+            var weight = weightData.split('\n').map(row => row.split(','));
+            var stock = stockData.split('\n').map(row => row.split(','));
+
+            // Filter data based on selected item
+            var barcodeItemData = sales.filter(row => row[1] === selectedItem);
+            var rfidItemData = rfid.filter(row => row[1] === selectedItem);
+            var weightItemData = weight.filter(row => rfidItemData.some(item => item[2] === row[1]));
+            var stockItemData = stock.filter(row => rfidItemData.some(item => item[2] === row[1]));
+
+            // Perform calculations and visualizations based on selected item
+            var today = new Date().toISOString().slice(0, 10);
+            var numberOfItemsSoldToday = barcodeItemData.filter(row => row[0] === today).length;
+
+            var weightPerUnit = parseFloat(rfidItemData[0][3]);
+            var presentStocks = weightItemData.reduce((acc, curr) => acc + parseFloat(curr[2]), 0) / weightPerUnit;
+            var totalStocks = stockItemData.reduce((acc, curr) => acc + parseFloat(curr[2]), 0) / weightPerUnit;
+            totalStocks += presentStocks;
+
+            var refillItemCount = totalStocks - numberOfItemsSoldToday;
+
+            // Update HTML elements with analysis results
+            document.getElementById('refillInfo').innerHTML = `<p>Number of Items Sold Today: ${numberOfItemsSoldToday}</p>
+                                                                <p>Present Stocks: ${presentStocks}</p>
+                                                                <p>Total Stocks: ${totalStocks}</p>
+                                                                <p>Refill Item Count: ${refillItemCount}</p>`;
+        }
+
+        // Call readCSV function to load data when page loads
+        window.onload = function() {
+            // Load CSV data when the page loads
+            readCSV('rfid_sensor_data.csv', function(rfidData) {
+                // Extract unique item names from RFID data
+                var items = rfidData.split('\n').map(row => row.split(',')[1]).filter((value, index, self) => self.indexOf(value) === index);
+                
+                // Populate item dropdown with available items
+                var itemDropdown = document.getElementById('itemDropdown');
+                items.forEach(function(item) {
+                    var option = document.createElement('option');
+                    option.text = item;
+                    option.value = item;
+                    itemDropdown.add(option);
+                });
+
+                // Handle item selection change
+                document.getElementById('itemDropdown').addEventListener('change', function() {
+                    var selectedItem = this.value;
+                    // Load other CSV data and analyze
+                    readCSV('barcode_sensor_data.csv', function(salesData) {
+                        readCSV('weight_sensor_data.csv', function(weightData) {
+                            readCSV('stocks.csv', function(stockData) {
+                                analyzeData(selectedItem, salesData, rfidData, weightData, stockData);
+                            });
+                        });
+                    });
+                });
+            });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIntellect Bussiness Statistics</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="main">
+    <div class="container">
+        <div class="navbar">
+            <a href=""><img src="images/logo.png" class="logo"></a>
+            <nav>
+                <ul id="menuList">
+                    <li><a href="">Sales Data</a></li>
+                    <li><a href="">Cash Flows</a></li>
+                    <li><a href="">Inventory Mangement</a></li>
+                    <li><a href="">Predictive Analysis</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </nav>
+            <img src="images/menu.png" class="menu-icon" onclick="togglemenu()">
+        </div>
+        <div class="row">
+            <div class="col-1">
+                <h2>BIntellect</h2>
+                <h3>"A single stop solution for all your bussiness needs"</h3>
+                <p>The BIntellect is a virtual personal assistance to your business statistics where it integrates with your workflows like the inventory management, cash flows and sales analysis.</p>
+                <h4>Sounds Excited! Please Login or register below to explore the new world for Entrepreneurs...</h4>
+                <button type="submit"><a href="loginpage.html">Login/Register</a><img src="images/login.png"></button>
+            </div>
+            <div class="col-2">
+                <video autoplay loop muted plays-inline class="home">
+                    <source src="images/home.mp4" type="video/mp4">
+                </video>
+                <div class="color-box"></div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        var menuList = document.getElementById("memuList");
+        menuList.style.maxHeight = "0px";
+        function togglemenu(){
+            if(menuList.style.maxHeight == "0px")
+            {
+                menuList.style.maxHeight = "130px";
+            }
+            else
+            {
+                menuList.style.maxHeight = "0px";
+            }
+        }
+    </script>
+</body>
+</html>
